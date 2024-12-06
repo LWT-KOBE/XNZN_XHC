@@ -10,6 +10,8 @@ balance_target_t Angle_Goal;
 balance_target_t Motor_SpeedA_Goal;
 balance_target_t Motor_SpeedB_Goal;
 
+
+//哈哈哈哈哈哈哈哈 我是你爹
 //uint8_t temp[8]={0};
 
 CascadePID mypid = {0}; //创建串级PID结构体变量

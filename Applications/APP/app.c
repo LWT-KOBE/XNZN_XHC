@@ -227,7 +227,7 @@ u8 FollowMidSpeed = 10;//跟随间隔中速 ADDR 10
 u8 FollowLowSpeed = 5;//跟随间隔低速 ADDR 11
 
 u8 InStationHigtoMidSpeed = 10;//进入装载区前高速减中速 ADDR 12
-u8 InStationMidtoLowSpeed = 4;//进入装载区前中速减低速 ADDR 13
+u8 InStationMidtoLowSpeed = 4;//进入装载区后中速减低速 ADDR 13
 u8 TrainMaxNum = 3;//火车数量    				ADDR 14
 u16 RecycleCaseNum = 77;//回收格口  			ADDR 15-16
 
@@ -702,10 +702,10 @@ void TIM2_IRQHandler(void)
 				Timer100msCount = 0;
 				if(ReadSpeedFlag == 0)
 				{
-						gSpeedRA = PulseCntA*3.966f;
+						gSpeedRA = PulseCntA*3.866f;
 						PulseCntA = 0;
 					
-						gSpeedRB = PulseCntB*3.966f;//3.666f
+						gSpeedRB = PulseCntB*3.866f;//3.666f
 						PulseCntB = 0;
 					
 						if(gSpeedRA > gSpeedRB)
@@ -792,6 +792,8 @@ u8 LoadingStation(void)
 		if(H_LD == 0 && Q_LD ==0)
 		{
 			SwitchCount++;
+			if(gSpeedR >= 30)
+				SwitchCount2++;				
 			if(SwitchCount == 1)
 			{
 				Pocket_A_Count1++;
@@ -816,8 +818,7 @@ u8 LoadingStation(void)
 			//241105
 			
 	/*  长遮光  */		
-			if(gSpeedR >= 50)
-				SwitchCount2++;		
+	
 			if(SwitchCount2 >= 200)//触发进站
 			{
 				if(LD_Step == 0)
@@ -838,7 +839,7 @@ u8 LoadingStation(void)
 		if(H_LD_B == 0 && Q_LD_B ==0)
 		{
 			SwitchCount_B++;
-			if(gSpeedR >= 50)
+			if(gSpeedR >= 30)
 				SwitchCount2_B++;
 			
 			if(SwitchCount_B == 1)
@@ -858,7 +859,7 @@ u8 LoadingStation(void)
 						TrainStop &= ~0x08;
 						CarInStationDieStop = 0;
 					}
-					else if(CarInStationFlag ==0 && InStationCount >0)//长遮光未识别停车
+				  if(CarInStationFlag ==0 && InStationCount >0 && TrainState != ST10)//长遮光未识别停车
 					{
 						TrainStop |= 0x08;
 						CarInStationDieStop = 1;

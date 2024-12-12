@@ -26,17 +26,16 @@ u16 SensorWarningDelay1,SensorWarningDelay2,SensorWarningDelay3,SensorWarningDel
 u8 TrainDircition = 0;//0--前进   1--后退
 u8 TrainState = 0;//火车状态 
 u8 TrainStateOld = 0;//
-u8 StepState = 0;   //1跟随  2进站减速 3申请出站 4出站速度  5手动模式装载速度  7自检  8进站高速减中速  9车厢失联
+u8 StepState = 0;   //1跟随  2进站减速 3申请出站 4出站速度  5手动模式装载速度 6出站加速 7自检  8进站高速减中速  9车厢失联
 u8 StepSt0 = 0;
 u8 CarGoGoFlag = 0;
-u8 PocketStep = 0;
+u8 PocketStep = 0;//出站单次逻辑处理
 u8 OldTrainState,NewTrainState;
 u8 zeroCount = 0;
 u8 zeroFlag = 0;
 u32 TrainMileage = 0;
 u32 OldTrainMileage = 0;
 u8 vofa_sendFlag = 0;
-u8 InStationLSFlag = 0;//进站提前减速
 
 u8 BasketNumber,DeliverResulBasketNumber = 0;
 
@@ -1908,6 +1907,12 @@ void TrainContral (void)
 			StepState = 4;
 			CarGoGoFlag = 0;			
 		}
+		
+		if(Pocket_A_Count == TrainBasketMaxNum + Pocket4 + 3)//加速点位
+		{
+			StepState = 6;	
+		}		
+		
 //	CarPositionPocket = Pocket_A_Count + CageNumber; //挡片数+接近挡片
 		for(u8 a = 0;a<TrainBasketMaxNum;a++)//车厢在线封装在车厢故障
 		{
@@ -1936,41 +1941,24 @@ void TrainContral (void)
 			TrainStop &= ~0x40;//			
 			BoxesDieStop = 0;
 		}	
-
-		if(CageNumber >= CaseNum - InStationHigtoMidSpeed && CageNumber < CaseNum - MFContralDS)//进站提前减速  0911 75
+		
+		if(CageNumber > CaseNum - MFContralDS)//进站前高速减中速  0911 75
 		{	
 			if(TrainState > ST1)
 			{
-				PocketStep = 0;
-				InStationLSFlag = 1;
 				StepState = 8;
 				LD_Step = 0;
+				PocketStep = 0;
 			}
 			if((TrainState == ST1 || TrainState == ST10) && FrontCarInStationCount >= 1  && InStationCount >= 1)
-			{
-				PocketStep = 0;
-				InStationLSFlag = 1;
+			{	
 				StepState = 8;
-				LD_Step = 0;				
+				LD_Step = 0;
+				PocketStep = 0;				
 			}
 		}
-		else if(CageNumber >= CaseNum - MFContralDS)//进站提前减速  0911 75
-		{	
-			if(TrainState > ST1)
-			{
-				PocketStep = 0;
-				InStationLSFlag = 1;
-				StepState = 2;
-				LD_Step = 0;
-			}
-			if((TrainState == ST1 || TrainState == ST10) && FrontCarInStationCount >= 1  && InStationCount >= 1)
-			{
-				PocketStep = 0;
-				InStationLSFlag = 1;
-				StepState = 2;
-				LD_Step = 0;				
-			}
-		}		
+		
+	
 		
 //		else if(CageNumber >= CaseNum - InStationHigtoMidSpeed && CageNumber < CaseNum - MFContralDS)//进站前高速减中速67 75
 //		{	
@@ -2010,8 +1998,8 @@ void TrainContral (void)
 //		if(CageNumber >= MFContralZS && CageNumber < (CaseNum - InStationHigtoMidSpeed) && TrainState != ST1 && TrainState != ST9 )
 //		if(CageNumber >= MFContralZS && CageNumber < (CaseNum - MFContralDS) && TrainState != ST1 && TrainState != ST9  && TrainState != ST10 )
 		
-		//if(CageNumber >= MFContralZS && CageNumber < (CaseNum - MFContralDS) && InStationCount >=1 && TrainState != ST9  && TrainState != ST10 )
-		if(CageNumber >= MFContralZS && CageNumber < (CaseNum - InStationHigtoMidSpeed) && InStationCount >=1 && TrainState != ST9  && TrainState != ST10 )
+		if(CageNumber >= MFContralZS && CageNumber < (CaseNum - MFContralDS) && InStationCount >=1 && TrainState != ST9  && TrainState != ST10 )
+//		if(CageNumber >= MFContralZS && CageNumber < (CaseNum - InStationHigtoMidSpeed) && InStationCount >=1 && TrainState != ST9  && TrainState != ST10 )
 		{
 			if(TrainState == ST6)	
 				StepState =1;
@@ -2095,16 +2083,12 @@ void TrainContral (void)
 					}
 					else//低速行驶	
 					{
-						if(gSpeedR > MidSpeed)
+//						if(gSpeedR > MidSpeed)
 							MBSpeed = MidSpeed;
-//						else if(gSpeedR > MidSpeed && gSpeedR <= HigSpeed)
+//						else
 //						{
 //							MBSpeed = LowSpeed;
 //						}
-						else
-						{
-							MBSpeed = LowSpeed;
-						}
 						BreakStopFlag = 0;
 						MOTOR_ENA_B = 1;						
 					}
@@ -2137,30 +2121,30 @@ void TrainContral (void)
 				}			
 			}	
 
-//			else if(StepState == 6 )//自检进站减速
-//			{
-//				if(CarScranFlag == 0x01 || TrainRestFlag ==1 || BoxesDieStop == 1 || CarInStationDieStop == 1)//网关紧急停车
-//				{
-//					MOTOR_ENA_B = 0;
-//					MBSpeed = 0;
-//					MoterBrakeFlag = 1;//急刹
-//				}
-//				else				
-//				{
-//					if(MF_SW == 0)//漫反射触发立即刹车
-//					{
-//						MOTOR_ENA_B = 0;
-//						MBSpeed = 0;
-//						MoterBrakeFlag = 1;//刹车
-//					}
-//					else//低速行驶	
-//					{
-//						MBSpeed = 150;
-//						BreakStopFlag = 0;
-//						MOTOR_ENA_B = 1;						
-//					}
-//				}			
-//			}
+			else if(StepState == 6 )//出站加速
+			{
+				if(CarScranFlag == 0x01 || TrainRestFlag ==1 || BoxesDieStop == 1 || CarInStationDieStop == 1)//网关紧急停车
+				{
+					MOTOR_ENA_B = 0;
+					MBSpeed = 0;
+					MoterBrakeFlag = 1;//急刹
+				}
+				else				
+				{
+					if(MF_SW == 0)//漫反射触发立即刹车
+					{
+						MOTOR_ENA_B = 0;
+						MBSpeed = 0;
+						MoterBrakeFlag = 1;//刹车
+					}
+					else//
+					{
+						MBSpeed = MidSpeed;
+						BreakStopFlag = 0;
+						MOTOR_ENA_B = 1;						
+					}
+				}			
+			}
 			else if(StepState == 7)//自检第一圈速度
 			{
 				if(CarScranFlag == 0x01 || TrainRestFlag ==1 || BoxesDieStop == 1 || CarInStationDieStop == 1)//网关紧急停车
@@ -2336,7 +2320,7 @@ void TrainContral (void)
 									MBSpeed = 0;
 									MoterBrakeFlag = 1;//刹车
 									TrainState = ST4;
-									InStationLSFlag = 0;
+									
 									
 								}
 							}	 

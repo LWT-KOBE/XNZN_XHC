@@ -44,7 +44,6 @@ extern u16 Uart2_Rx_length;
 extern u16 Uart2_Tx_length;
 
 extern u8 StepSt0;
-extern u8 InStationLSFlag;
 extern u8 GoTrainflag ;
 extern u8 TravelCommand;
 extern u8 DeliverResulBasketNumber;

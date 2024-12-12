@@ -4,7 +4,7 @@
 
 Cascade_PIDA  PIDA;             	/* 串级PIDA轮参数结构体 */
 
-float MyPidKp = 50.0f;
+float MyPidKp = 40.0f;
 float MyPidKi = 0.501f;
 float MyPidKd = 1.0;
 float pwmtest = 0;
@@ -690,12 +690,12 @@ float Position_PIDA(Cascade_PIDA *PID,float target)
 
 		if(StepState == 2 || StepState == 8)
 		{
-			MyPidKi = 0.501f;
+			MyPidKi = 0.551f;
 		}
 		else
 		{
 			if(gSpeedR <= target)
-				MyPidKi = 0.991f;
+				MyPidKi = 1.091f;
 			else if(gSpeedR > target && gSpeedR <= target + 5)
 			{
 				MyPidKi = 0.901f;

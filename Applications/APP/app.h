@@ -23,7 +23,7 @@ extern u8 SensorLD;
 #define DriveMode  1//电机驱动类型 0--老驱动板 1--ODRIVE
 #define NFCMode    0  //NFC模式   0--挡片模式  1--NFC模式
 
-#define TrainVersion  2  //版本号
+#define TrainVersion  3  //版本号
 
 //#define IAP_CAN_ID  01
 

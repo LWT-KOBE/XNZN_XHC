@@ -27,76 +27,8 @@ Project File Date:  12/02/2024
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 7 (build 960)', folder: 'D:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'ModularReader'
-compiling app_Init.c...
-compiling pid.c...
-Applications\pid.c(291): warning:  #550-D: variable "last_dev"  was set but never used
-  	 static float Bias,Pwm,Last_bias=0,Prev_bias=0,Incremental_KP,Incremental_KI,Incremental_KD,last_dev,this_dev,alpha;
-Applications\pid.c(291): warning:  #177-D: variable "alpha"  was declared but never referenced
-  	 static float Bias,Pwm,Last_bias=0,Prev_bias=0,Incremental_KP,Incremental_KI,Incremental_KD,last_dev,this_dev,alpha;
-Applications\pid.c(373): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-  	if(Pwm>0.1) Pwm  =  0.1;
-Applications\pid.c(493): warning:  #550-D: variable "last_Input"  was set but never used
-      static float Bias,Pwm,Last_Bias,Integral_bias=0,Position_KP,Position_KI,Position_KD,last_dev,this_dev,alpha,last_Input;
-Applications\pid.c(715): warning:  #177-D: variable "a"  was declared but never referenced
-      static float Bias,Pwm,Last_Bias,Integral_bias=0,a = 0;
-Applications\pid.c: 5 warnings, 0 errors
-compiling main.c...
-compiling isp_spi.c...
-compiling XHC_Task.c...
-compiling CAN2_Task.c...
-compiling isp_exit.c...
-compiling odrive.c...
-Applications\odrive.c(1302): warning:  #111-D: statement is unreachable
-  						break;								
-Applications\odrive.c(1360): warning:  #111-D: statement is unreachable
-  						break;								
-Applications\odrive.c(1420): warning:  #111-D: statement is unreachable
-  						break;								
-Applications\odrive.c(1478): warning:  #111-D: statement is unreachable
-  						break;								
-Applications\odrive.c(904): warning:  #550-D: variable "can2"  was set but never used
-  static BSP_CAN_TypeDef can2;
-Applications\odrive.c: 5 warnings, 0 errors
-compiling BSP_eeprom.c...
-compiling remote.c...
-compiling supervisor.c...
-compiling control.c...
-compiling balance.c...
-Applications\balance.c(72): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-  			}else if(OdReceivedData.vel_estimate[1].float_temp * 0.2199f  > 0.2){
-Applications\balance.c: 1 warning, 0 errors
-compiling app.c...
-Applications\APP\app.c(945): warning:  #940-D: missing return statement at end of non-void function "LoadingStation" 
-  }
-Applications\APP\app.c: 1 warning, 0 errors
-compiling MYADC.c...
-compiling State.c...
-Applications\STATE\State.c(1096): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-  	SendDataBuf3[13+3] = PIDA.PWM*0.03;
-Applications\STATE\State.c(2432): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-  			gSpeedRA = -OdReceivedData.vel_estimate[0].float_temp *22.0;
-Applications\STATE\State.c(2435): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-  			gSpeedRB =  OdReceivedData.vel_estimate[1].float_temp *22.0;
-Applications\STATE\State.c(2438): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-  			gSpeedRC = -OdReceivedData.vel_estimate[2].float_temp *22.0;
-Applications\STATE\State.c(2441): warning:  #1035-D: single-precision operand implicitly converted to double-precision
-  			gSpeedRD =  OdReceivedData.vel_estimate[3].float_temp *22.0;
-Applications\STATE\State.c: 5 warnings, 0 errors
-compiling isp_tim.c...
-compiling cigan.c...
-compiling config.c...
-compiling encoder.c...
-compiling usartx.c...
-BSP\usartx.c(838): warning:  #188-D: enumerated type mixed with another type
-  				OdriveData.AxisState[0] = 27;
-BSP\usartx.c(959): warning:  #177-D: variable "ucRxBuffer"  was declared but never referenced
-  	static unsigned char ucRxBuffer[250];
-BSP\usartx.c: 2 warnings, 0 errors
-linking...
-Program Size: Code=63092 RO-data=1924 RW-data=1476 ZI-data=83184  
-FromELF: creating hex file...
 After Build - User command #1: fromelf --bin -o ".\bin_file\ModularReader.bin" "D:\Ð¡»ð³µ-LSC\Work\ÖÇ»ðIAP2.0\20241206\HEAD\OdriveTrainRev2.0(241206)\Objects\ModularReader.axf"
-".\Objects\ModularReader.axf" - 0 Error(s), 19 Warning(s).
+".\Objects\ModularReader.axf" - 0 Error(s), 0 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -109,7 +41,7 @@ Package Vendor: Keil
   C:\Users\RUANYONGYI\AppData\Local\Arm\Packs\Keil\STM32F4xx_DFP\2.7.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include
 
 <h2>Collection of Component Files used:</h2>
-Build Time Elapsed:  00:00:07
+Build Time Elapsed:  00:00:02
 </pre>
 </body>
 </html>

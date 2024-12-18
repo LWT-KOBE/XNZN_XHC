@@ -970,6 +970,21 @@
           <WinNumber>1</WinNumber>
           <ItemText>Pocket_A_Count</ItemText>
         </Ww>
+        <Ww>
+          <count>161</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>PocketCount2</ItemText>
+        </Ww>
+        <Ww>
+          <count>162</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>CarDistance</ItemText>
+        </Ww>
+        <Ww>
+          <count>163</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>StepState</ItemText>
+        </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>
@@ -991,6 +1006,26 @@
           <count>3</count>
           <WinNumber>2</WinNumber>
           <ItemText>BasketError</ItemText>
+        </Ww>
+        <Ww>
+          <count>4</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>PocketCount1</ItemText>
+        </Ww>
+        <Ww>
+          <count>5</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>PocketCount2</ItemText>
+        </Ww>
+        <Ww>
+          <count>6</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>Pocket_A_Count1</ItemText>
+        </Ww>
+        <Ww>
+          <count>7</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>Pocket_A_Count2</ItemText>
         </Ww>
       </WatchWindow2>
       <Tracepoint>

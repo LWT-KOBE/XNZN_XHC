@@ -8,7 +8,7 @@
 extern u32 CAN_ID ;
 extern u8 RxRAM0[8];
 extern u8 Rxflag1 ;
-extern int PocketCount,PocketCountold;//U型挡片计数
+extern int PocketCount;//U型挡片计数
 extern int Pocket_A_Count,OldPocket_A_Count,NewPocket_A_Count;
 
 extern u16 gCheckHeartLiveCount[21];
@@ -72,6 +72,7 @@ void IAP_APP_CAN_ReStart(CanRxMsg temp_CAN_Msg);
 #define MOTOR_DIRB 			PCout(5)
 #define MOTOR_ENA_B 		PAout(5)
 
+#define WIFI_REST				PBout(13)
 
 #define Q_GDSW PBin(3) 
 #define H_GDSW PDin(2) 

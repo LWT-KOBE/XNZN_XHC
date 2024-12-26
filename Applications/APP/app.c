@@ -39,7 +39,7 @@ u32 CAN_ID = 0;
 u8 RxRAM0[8];
 u8 Rxflag1 = 0;
 u32 g_Lock_Code = 0x34;
-int PocketCount,PocketCountold = 0;//U型挡片计数
+int PocketCount = 0;//U型挡片计数
 
 int PocketCount1,PocketCount2 = 0; 
 
@@ -801,11 +801,7 @@ u8 LoadingStation(void)
 					Pocket_A_Count = Pocket_A_Count1;
 				else
 					Pocket_A_Count = Pocket_A_Count2;
-				SwitchCount2 = 0;
-				if(Pocket_A_Count == Pocket4)//0802
-				{
-					PocketCountold = 0;
-				}			
+				SwitchCount2 = 0;			
 			}
 			else if(SwitchCount >= 20 )
 			{
@@ -850,22 +846,7 @@ u8 LoadingStation(void)
 				else
 					Pocket_A_Count = Pocket_A_Count2;			
 				SwitchCount2_B = 0;
-						
-				if(Pocket_A_Count == Pocket4)//0802
-				{
-					PocketCountold = 0;
-					if(CarInStationFlag ==1 && InStationCount >0)//241204
-					{
-						TrainStop &= ~0x08;
-						CarInStationDieStop = 0;
-					}
-				  if(CarInStationFlag ==0 && InStationCount >0 && TrainState != ST10)//长遮光未识别停车
-					{
-						TrainStop |= 0x08;
-						CarInStationDieStop = 1;
-					}						
-					
-				}			
+								
 			}
 			else if(SwitchCount_B >= 20 )
 			{
@@ -906,7 +887,6 @@ u8 LoadingStation(void)
 			Pocket_A_Count = 0;
 			Pocket_A_Count1 = 0;
 			Pocket_A_Count2 = 0;		
-			PocketCountold = PocketCount;
 			CageNumber = 0;PocketCount = 0;//清零格口计数
 			PocketCount1 = 0;
 			PocketCount2 = 0;		

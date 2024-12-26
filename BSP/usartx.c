@@ -207,7 +207,7 @@ void uart2_init(u32 bound)
 	GPIO_InitStructure.GPIO_Mode=GPIO_Mode_AF;            //输出模式
 	GPIO_InitStructure.GPIO_OType=GPIO_OType_PP;          //推挽输出
 	GPIO_InitStructure.GPIO_Speed=GPIO_Speed_50MHz;       //高速50MHZ
-	GPIO_InitStructure.GPIO_PuPd=GPIO_PuPd_UP;            //上拉
+	GPIO_InitStructure.GPIO_PuPd=GPIO_PuPd_NOPULL;            //上拉
 	GPIO_Init(GPIOA, &GPIO_InitStructure);  		          //初始化
 	
 	//UsartNVIC configuration //UsartNVIC配置

@@ -84,6 +84,7 @@ void CAN2_TaskUpdateTask(void *Parameters){
 			digitalHi(&getCAN2_Task()->dataInitFlag);
 			
 		}
+		
 		Remote_Keyvalue = Remote_Scan();
 		for(u8 i = 0;i<TrainBasketMaxNum;i++)
 		{
@@ -308,6 +309,22 @@ void CAN2_TaskUpdateTask(void *Parameters){
 			TrainStop &= ~0xfe;
 		
 
+		if(CageNumber >= CaseNum + 10)//241220
+		{
+			if(CarInStationFlag ==1)
+			{
+				TrainStop &= ~0x08;
+				CarInStationDieStop = 0;
+			}
+			else//长遮光未识别停车
+			{
+				TrainStop |= 0x08;//
+				CarInStationDieStop = 1;
+			}						
+			
+		}			
+		
+		
 //		if(CageNumber == 10 && LDDelayFlag == 0)
 //		{
 //			TrainStop |= 0x08;

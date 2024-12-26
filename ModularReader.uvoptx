@@ -985,6 +985,11 @@
           <WinNumber>1</WinNumber>
           <ItemText>StepState</ItemText>
         </Ww>
+        <Ww>
+          <count>164</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>APPSendADDRFlag</ItemText>
+        </Ww>
       </WatchWindow1>
       <WatchWindow2>
         <Ww>

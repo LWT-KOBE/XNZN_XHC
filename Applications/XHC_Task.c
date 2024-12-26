@@ -27,6 +27,7 @@ void XHC_TaskUpdateTask(void *Parameters){
 			digitalHi(&getXHC_Task()->dataInitFlag);
 			
 		}
+		WIFI_REST = 1;
 //////////////		
 		USART_Data_Send_Task();//´®¿Ú·¢ËÍ
 //////////////	

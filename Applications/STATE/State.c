@@ -249,10 +249,19 @@ void IO_Init(void)
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;//100MHz
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN;//下拉
 	GPIO_Init(GPIOC, &GPIO_InitStructure);//初始化GPIO	
+	
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_13;//WIFI模组复位
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;//
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;//100MHz
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;//上拉
+	GPIO_Init(GPIOB, &GPIO_InitStructure);//初始化GPIO		
+	
+	
 
 	MOTOR_ENA_B = 0;
 	MBSpeed = 0;
-
+//	WIFI_REST = 0;
 	
 }
 
@@ -1901,8 +1910,8 @@ void USART_Data_Send_Task (void)
 
 void TrainContral (void)
 {	
-		if(APPSendADDRDelay >= 10000)
-			APPSendADDRFlag = 0;
+//		if(APPSendADDRDelay >= 10000)//超时未收到发车 241226屏蔽
+//			APPSendADDRFlag = 0;
 		
 		if(CarGoGoFlag == 1 && APPSendADDRFlag ==0)
 		{
@@ -2329,7 +2338,7 @@ void TrainContral (void)
 		
 //////////////////////////////////跟随////////////////////////////////////
 		
-		if(PocketCount == 1)//0807
+		if(PocketCount == 10)//0807
 			TrainApplyForExitFlag= 0;//收到发车指令清除申请标志位			
 ////////////////////////////		
 		ApplicationtTavel = TrainBasketMaxNum + Pocket4 + 1;//申请出站位置计算

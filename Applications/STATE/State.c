@@ -56,7 +56,7 @@ u8 SendDataBuf4[6];
 u8 SendDataBuf5[6];
 u8 SendDataBuf6[27];
 u8 SendDataBuf7[6];
-u8 SendDataBuf8[8];
+u8 SendDataBuf8[18];
 u8 SendDataBuf9[30];
 u8 SendDataBuf10[50];
 u8 SendDataBuf11[10];
@@ -103,12 +103,20 @@ u32 CheckSumAPP1 = 0;
 u32 CheckSumAPP2 = 0;
 u8 wer = 0;
 
+u8 TrainSetingFlag = 0;
+
+u8 HeartAckFlag = 0;
+u32 HeartAckDelay = 0;
+
+
 u8 test121 = 0;
 u8 test123 = 0;
 u8 test124 = 0;
 
 //#define BEEP_ON  GPIO_SetBits(GPIOA,GPIO_Pin_11)
 //#define BEEP_OFF GPIO_ResetBits(GPIOA,GPIO_Pin_11)
+
+u8 JNDtest = 0;
 
 void IO_Init(void)
 {    	 
@@ -279,86 +287,29 @@ void TrainBusinessLogic (void)
 				CheckSumAPP2 = CheckSumAPP2 & 0xff;
 			}
 			if(CheckSumAPP2 == Uart1_Rx[Uart1_Rx_length-2])
-			{					
-			//	if(TrainState == ST0)
-				WPS = 0;//写保护关闭
-				delay_ms(1);
+			{						
 				{
-					CaseNum = Uart1_Rx[4]<<8 |Uart1_Rx[5];
-					EEPROM_Write_u16(0,CaseNum);//2
-					delay_ms(5);
-					
+					CaseNum = Uart1_Rx[4]<<8 | Uart1_Rx[5];
 					Pocket4 = Uart1_Rx[9];
-					EEPROM_Write_Byte(2, Pocket4);// 
-					delay_ms(5);
-					
-//					if(Uart1_Rx[11] == TrainHeadNum || Uart1_Rx[11] ==0xff)//
-					{
-						TrainBasketMaxNum = Uart1_Rx[8];//
-						EEPROM_Write_Byte(3,TrainBasketMaxNum);
-						delay_ms(5);
-					}
-					
+//				if(Uart1_Rx[11] == TrainHeadNum || Uart1_Rx[11] ==0xff)//
+					TrainBasketMaxNum = Uart1_Rx[8];//
 					TrainMode = Uart1_Rx[10];
-					EEPROM_Write_Byte(4,TrainMode);
-					delay_ms(5);
-					
-					HigSpeed = Uart1_Rx[12];
-					EEPROM_Write_Byte(5,HigSpeed);
-					delay_ms(5);
-						
+					HigSpeed = Uart1_Rx[12];	
 					MidSpeed = Uart1_Rx[13];
-					EEPROM_Write_Byte(6,MidSpeed);
-					delay_ms(5);
-					
 					LowSpeed = Uart1_Rx[14];
-					EEPROM_Write_Byte(7,LowSpeed);
-					delay_ms(5);	
-
 					OutStationQuicken = Uart1_Rx[11];
-					EEPROM_Write_Byte(8,OutStationQuicken);
-					delay_ms(5);	
-					
 					FollowHigSpeed = Uart1_Rx[15];
-					EEPROM_Write_Byte(9,FollowHigSpeed);
-					delay_ms(5);		
-
 					FollowMidSpeed = Uart1_Rx[16];
-					EEPROM_Write_Byte(10,FollowMidSpeed);
-					delay_ms(5);	
-
 					FollowLowSpeed = Uart1_Rx[17];
-					EEPROM_Write_Byte(11,FollowLowSpeed);
-					delay_ms(5);	
-
 					InStationHigtoMidSpeed = Uart1_Rx[19];
-					EEPROM_Write_Byte(12,InStationHigtoMidSpeed);
-					delay_ms(5);	
-					
 					InStationMidtoLowSpeed = Uart1_Rx[20];
-					EEPROM_Write_Byte(13,InStationMidtoLowSpeed);
-					delay_ms(5);	
-					
 					TrainMaxNum = Uart1_Rx[21];
-					EEPROM_Write_Byte(14,TrainMaxNum);
-					delay_ms(5);	
-
 					RecycleCaseNum = Uart1_Rx[6]<<8 |Uart1_Rx[7];
-					EEPROM_Write_u16(15,RecycleCaseNum);//15-16	
-					delay_ms(5);
-
 					MFContralZS = Uart1_Rx[22];
-					EEPROM_Write_Byte(17,MFContralZS);
-					delay_ms(5);	
-
 					MFContralDS = Uart1_Rx[23];
-					EEPROM_Write_Byte(18,MFContralDS);
-					delay_ms(5);	
-
-					ConfigrationFlag = 1; //设置标志位
-					WPS = 1;
+					
+					TrainSetingFlag = 1;				
 				}
-				
 			}
 		}
 
@@ -382,27 +333,43 @@ void TrainBusinessLogic (void)
 					{
 						if(BasketError[b] ==0)//车厢有故障不接收下发地址
 						{
-							if((Uart1_Rx[4+2*b]<<8 | Uart1_Rx[5+2*b]) >0 && (Uart1_Rx[4+2*b]<<8 | Uart1_Rx[5+2*b]) < CaseNum)
+							if(((BoxCopyAddrFlag >> b)&0x01) != 0x01)
 							{
-								APPSendADDRACKFlag =1;
-								HeadSendBasketFlag &= ~0x03;
-								HeadSendBasketFlag |= 0x01;						
-								APPSendADDRFlag |= 1 << b;	
-								AppSendAddr[b] = ((b+1)<<16) | (Uart1_Rx[4+2*b]<<8) | (Uart1_Rx[5+2*b]);
-								AddrAckState[b] = 1;
+								if((Uart1_Rx[4+2*b]<<8 | Uart1_Rx[5+2*b]) >0 && (Uart1_Rx[4+2*b]<<8 | Uart1_Rx[5+2*b]) < CaseNum)
+								{
+									APPSendADDRACKFlag =1;
+									HeadSendBasketFlag &= ~0x03;
+									HeadSendBasketFlag |= 0x01;						
+									APPSendADDRFlag |= 1 << b;
+									BoxCopyAddrFlag |= 1 << b;
+									AppSendAddr[b] = ((b+1)<<16) | (Uart1_Rx[4+2*b]<<8) | (Uart1_Rx[5+2*b]);
+									AddrAckState[b] = 1;
+								}	
+								else if((Uart1_Rx[4+2*b]<<8 | Uart1_Rx[5+2*b]) >= CaseNum)
+								{
+									APPSendADDRACKFlag =1;
+									HeadSendBasketFlag &= ~0x03;
+									HeadSendBasketFlag |= 0x01;						
+									APPSendADDRFlag |= 1 << b;
+									BoxCopyAddrFlag |= 1 << b;
+									AppSendAddr[b] = ((b+1)<<16) | RecycleCaseNum;
+									AddrAckState[b] = 2;
+								}
+								else if((Uart1_Rx[4+2*b]<<8 | Uart1_Rx[5+2*b]) == 0)
+								{	
+									APPSendADDRACKFlag =1;
+									AddrAckState[b] = 4;
+								}
 							}	
-							else if((Uart1_Rx[4+2*b]<<8 | Uart1_Rx[5+2*b]) >= CaseNum)
+							else
 							{
 								APPSendADDRACKFlag =1;
-								HeadSendBasketFlag &= ~0x03;
-								HeadSendBasketFlag |= 0x01;						
-								APPSendADDRFlag |= 1 << b;								
-								AppSendAddr[b] = ((b+1)<<16) | RecycleCaseNum;
-								AddrAckState[b] = 2;
+								AddrAckState[b] = 5;								
 							}
 						}
 						else
 						{
+							APPSendADDRACKFlag =1;
 							AddrAckState[b] = 3;
 						}
 					}
@@ -481,7 +448,7 @@ void TrainBusinessLogic (void)
 //					}					
 //				}
 //			}				
-			else if(Uart1_Rx[1] == 0x02)//发车指令
+			if(Uart1_Rx[1] == 0x02)//发车指令
 			{	
 				if(TrainState == ST5)
 				{
@@ -575,6 +542,11 @@ void TrainBusinessLogic (void)
 			}			
 			
 			
+			else if(Uart1_Rx[1] == 0x09)//心跳应答信号
+			{
+				HeartAckDelay = 0;
+				HeartAckFlag = 1;
+			}
 		}
 		
 		if(Uart1_Rx[1] == 0x03)//收到自检指令
@@ -593,6 +565,8 @@ void TrainBusinessLogic (void)
 			
 			TrainApplyForExitFlag= 0;InStationFlag = 0;
 			StepSt0 = 0;
+			
+			TrainStop &= ~0x08;//清除长遮光未识别
 			
 		}
 		
@@ -712,6 +686,8 @@ void TrainBusinessLogic (void)
 				InStationCount = 0;
 				StepSt0 = 0;
 				TrainApplyForExitFlag= 0;InStationFlag = 0;	
+				
+				TrainStop &= ~0x08;//清除长遮光未识别
 			}
 			else if(Uart1_Rx[3] == 21)
 			{
@@ -728,6 +704,8 @@ void TrainBusinessLogic (void)
 				InStationCount = 0;
 				StepSt0 = 0;
 				TrainApplyForExitFlag= 0;InStationFlag = 0;	
+				
+				TrainStop &= ~0x08;//清除长遮光未识别
 			}
 		}
 	  else if(Uart1_Rx[4] == 2 && Uart1_Rx[5] == 2  && TrainHeadNum >= 11 && TrainHeadNum <= 20 && TrainState < ST2)//自检2
@@ -747,6 +725,8 @@ void TrainBusinessLogic (void)
 				InStationCount = 0;
 				StepSt0 = 0;
 				TrainApplyForExitFlag= 0;InStationFlag = 0;	
+				
+				TrainStop &= ~0x08;//清除长遮光未识别
 			}
 			else if(Uart1_Rx[3] == 21)
 			{
@@ -763,6 +743,8 @@ void TrainBusinessLogic (void)
 				InStationCount = 0;
 				StepSt0 = 0;
 				TrainApplyForExitFlag= 0;InStationFlag = 0;	
+				
+				TrainStop &= ~0x08;//清除长遮光未识别
 			}
 		}		
 		
@@ -1126,7 +1108,7 @@ void HeartToApp (u8 Type,u8 DataLen)//心跳包
 	SendDataBuf3[31+3] = gSpeedRC;
 	SendDataBuf3[32+3] = gSpeedRD;
 	SendDataBuf3[33+3] = TrainStop;
-	SendDataBuf3[34+3] = 0;	
+	SendDataBuf3[34+3] = JNDtest;	
 ////////////////////////////////////	
 	
 	
@@ -1255,8 +1237,15 @@ void  InStationToAPP(u8 Type,u8 DataLen)//进站上报
 
 ////////////////V////////////////////		
 	SendDataBuf8[0+3] = TrainHeadNum;
-	SendDataBuf8[1+3] = PocketCount>>8;
-	SendDataBuf8[2+3] = PocketCount;
+	SendDataBuf8[1+3] = PocketCountOld>>8;
+	SendDataBuf8[2+3] = PocketCountOld;
+	SendDataBuf8[3+3] = PocketCountOld_B>>8;
+	SendDataBuf8[4+3] = PocketCountOld_B;	
+	
+	SendDataBuf8[5+3] = Pocket_A_Count_A>>8;
+	SendDataBuf8[6+3] = Pocket_A_Count_A;
+	SendDataBuf8[7+3] = Pocket_A_Count_B>>8;
+	SendDataBuf8[8+3] = Pocket_A_Count_B;	
 	
 ////////////////TAIL/////////////////	
 	SendDataBuf8[3+DataLen] = 0x11;
@@ -1315,10 +1304,10 @@ void ADDRACKToApp (u8 Type,u8 DataLen)//下发地址应答 3
 	SendDataBuf10[1+3] = BasketReciveAddrFlag>>16;
 	SendDataBuf10[2+3] = BasketReciveAddrFlag>>8;
 	SendDataBuf10[3+3] = BasketReciveAddrFlag;
-	
+	SendDataBuf10[4+3] = TrainBasketMaxNum; 
 	for(u8 i = 0;i<TrainBasketMaxNum;i++)
 	{
-		SendDataBuf10[4+3+i] = AddrAckState[i];
+		SendDataBuf10[5+3+i] = AddrAckState[i];
 	}
 	
 ////////////////TAIL/////////////////	
@@ -1620,6 +1609,28 @@ u8 Can_Send_Distribute(u8 len)
 		{
 			HeadSendBasketFlag &= ~0x03;			
 		}
+		
+		
+//		if(((APPSendADDRFlag >> CanSendCoount)&0x01) == 0x01)
+//		{	
+//			if(((BoxCopyAddrFlag >> CanSendCoount)&0x01) != 0x01)
+//			{
+//				TxMessage.Data[2] = HeadSendBasketFlag;
+//				TxMessage.Data[3] = (AppSendAddr[CanSendCoount]>>16) & 0xff;			
+//				TxMessage.Data[4] = (AppSendAddr[CanSendCoount]>>8) & 0xff;
+//				TxMessage.Data[5] = AppSendAddr[CanSendCoount] & 0xff;				
+//			}
+//			else
+//			{
+//				TxMessage.Data[2] = 0;//0806
+//				TxMessage.Data[3] = 0;			
+//				TxMessage.Data[4] = 0;
+//				TxMessage.Data[5] = 0;				
+//			}
+
+//		}		
+		
+		
 		if(((APPSendADDRFlag >> CanSendCoount)&0x01) == 0x01)
 		{		
 			TxMessage.Data[2] = HeadSendBasketFlag;
@@ -1778,8 +1789,11 @@ void USART_Data_Send_Task (void)
 	{
 		SendUDPDataDelay200ms++;
 		SendUDPDataDelay100ms++;
-
-		if(SendUDPDataDelay100ms ==1)
+		if(SendUDPDataDelay100ms >5)
+		{
+			SendUDPDataDelay100ms = 0;
+		}	
+		else if(SendUDPDataDelay100ms ==1)
 		{			
 			if(TrainMode == 0)//手动扫码
 			{
@@ -1799,7 +1813,7 @@ void USART_Data_Send_Task (void)
 			{
 				if(APPSendADDRACKFlag ==1)
 				{	//下发地址应答
-					ADDRACKToApp(5,4+TrainBasketMaxNum);
+					ADDRACKToApp(5,5+TrainBasketMaxNum);
 					APPSendADDRACKFlag =0;
 				}					
 //				if(TrainState != ST1)
@@ -1837,8 +1851,8 @@ void USART_Data_Send_Task (void)
 	
 			if(ReadDataFlag == 1)//读取参数应答
 			{
-				ReadDataFlag = 0;
 				ReadDataACK(0xA2,21);
+				ReadDataFlag = 0;
 			}
 
 //			if(TrainApplyForExitFlag == 1)//申请出站
@@ -1848,13 +1862,9 @@ void USART_Data_Send_Task (void)
 //			}
 			if(InStationFlag ==1) //进站上报
 			{
-				InStationToAPP(0x00,3);
+				InStationToAPP(0x00,9);
 			}				
-			if(ConfigrationFlag == 1)//配置应答
-			{
-				ConfigrationAck(0xA1,1);
-				ConfigrationFlag = 0;			
-			}			
+			
 		}		
 		else if(SendUDPDataDelay100ms == 3)
 		{
@@ -1888,6 +1898,14 @@ void USART_Data_Send_Task (void)
 				TrainRestACK = 0;
 			}
 			
+			if(ConfigrationFlag == 1)//配置应答
+			{
+				//ConfigrationAck(0xA1,1);
+				ReadDataACK(0xA1,21);
+				ConfigrationFlag = 0;
+//				HeartDelayCount = 0;
+//				SendUDPDataDelay100ms = 0;
+			}				
 		}	
 		
 		else if(SendUDPDataDelay100ms ==5)
@@ -1899,10 +1917,7 @@ void USART_Data_Send_Task (void)
 				HeartToApp(9,35+TrainBasketMaxNum);//心跳	
 			}
 		}		
-		else if(SendUDPDataDelay100ms >5)
-		{
-			SendUDPDataDelay100ms = 0;
-		}	
+
 ////////////////////////////////////
 	}
 }
@@ -1910,10 +1925,11 @@ void USART_Data_Send_Task (void)
 
 void TrainContral (void)
 {	
-//		if(APPSendADDRDelay >= 10000)//超时未收到发车 241226屏蔽
+//		if(APPSendADDRDelay >= 1000)//超时未收到发车 
 //			APPSendADDRFlag = 0;
-		
-		if(CarGoGoFlag == 1 && APPSendADDRFlag ==0)
+//		
+//		if(CarGoGoFlag == 1 && APPSendADDRFlag ==0)
+		if(CarGoGoFlag == 1)
 		{
 			if(ChargeFlag == 1)
 				TrainState = ST9;
@@ -1923,10 +1939,6 @@ void TrainContral (void)
 			CarGoGoFlag = 0;			
 		}
 		
-		if(Pocket_A_Count == TrainBasketMaxNum + Pocket4 + 3)//加速点位
-		{
-			StepState = 6;	
-		}		
 		
 //	CarPositionPocket = Pocket_A_Count + CageNumber; //挡片数+接近挡片
 		for(u8 a = 0;a<TrainBasketMaxNum;a++)//车厢在线封装在车厢故障
@@ -1957,56 +1969,8 @@ void TrainContral (void)
 			BoxesDieStop = 0;
 		}	
 		
-		
-//		if(CageNumber > CaseNum - MFContralDS)//进站前高速减中速  0911 75
-//		{	
-//			if(TrainState > ST1)
-//			{
-//				StepState = 8;
-//				LD_Step = 0;
-//				PocketStep = 0;
-//			}
-//			if((TrainState == ST1 || TrainState == ST10) && FrontCarInStationCount >= 1  && InStationCount >= 1)
-//			{	
-//				StepState = 8;
-//				LD_Step = 0;
-//				PocketStep = 0;				
-//			}
-//		}
-		
-	
-		
-//		else if(CageNumber >= CaseNum - InStationHigtoMidSpeed && CageNumber < CaseNum - MFContralDS)//进站前高速减中速67 75
-//		{	
-//			if(TrainState > ST1)
-//			{
-//				PocketStep = 0;
-//				InStationLSFlag = 1;
-//				StepState = 8;
-//				LD_Step = 0;
-//			}
-//		}	
-//		else if(CageNumber >= CaseNum - InStationHigtoMidSpeed)//进站前中速减低速
-//		{	
-//			if(TrainState > ST1)
-//			{
-//				PocketStep = 0;
-//				InStationLSFlag = 1;
-//				StepState = 2;
-//			}
-//		}			
-//		if(TrainState == ST1 && InStationCount == 1 && Pocket_A_Count == 1)
-//		{
-//			StepState = 6;	
-//		}
-//////////////////////////////////跟随////////////////////////////////////
 
-		if(CageNumber == MFContralZS)//241105
-		{
-			Pocket_A_Count = 0;
-			Pocket_A_Count1 = 0;
-			Pocket_A_Count2 = 0;				
-		}	
+
 		
 		//if(CageNumber >= MFContralZS && CageNumber < (CaseNum - MFContralDS) && TrainState != ST1)
 		
@@ -2041,6 +2005,8 @@ void TrainContral (void)
 			}			
 		}
 		
+		if(TrainState == ST6 && CageNumber == OutStationQuicken)
+			StepState = 6;
 		if(TrainState == ST1 && (FrontCarInStationCount < 1  || InStationCount < 1))
 		{
 			StepState = 7;
@@ -2120,7 +2086,7 @@ void TrainContral (void)
 						{
 							if(FrontCarPositionPokec > CageNumber)
 							{
-								MBSpeed = 40;
+								MBSpeed = LowSpeed;
 								BreakStopFlag = 0;
 								MOTOR_ENA_B = 1;									
 							}
@@ -2338,8 +2304,10 @@ void TrainContral (void)
 		
 //////////////////////////////////跟随////////////////////////////////////
 		
-		if(PocketCount == 10)//0807
-			TrainApplyForExitFlag= 0;//收到发车指令清除申请标志位			
+//		if(PocketCount == 10)//加拿大测试出站刚好在这个位置导致一直不出站注释于
+//			TrainApplyForExitFlag= 0;//收到发车指令清除申请标志位		
+//		if(PocketCount == CaseNum*2)//加拿大测试出站刚好在这个位置导致一直不出站注释于
+//			TrainApplyForExitFlag= 0;//收到发车指令清除申请标志位			
 ////////////////////////////		
 		ApplicationtTavel = TrainBasketMaxNum + Pocket4 + 1;//申请出站位置计算
 		ForceTravel1 = TrainBasketMaxNum + Pocket4 + 2;//强制出站位置计算
@@ -2414,6 +2382,10 @@ void TrainContral (void)
 			StionStop = 0;//清除进站标志
 			LD_Step = 0;
 			CarInStationFlag = 0;
+			PocketCountOld = 0;
+			PocketCountOld_B = 0;
+			Pocket_A_Count_A = 0;
+			Pocket_A_Count_B = 0;
 		}		
 
 		if(TrainState == ST2 || TrainState == ST3 || TrainState == ST4|| TrainState == ST5)
@@ -2438,6 +2410,10 @@ void TrainContral (void)
 				TrainStop |= 0x10;//
 				InStationFlag = 0;
 				CarInStationFlag = 0;
+				PocketCountOld = 0;
+				PocketCountOld_B = 0;
+				Pocket_A_Count_A = 0;
+				Pocket_A_Count_B = 0;				
 			}	
 
 			if(Pocket_A_Count == ForceTravel1)//强制出站
@@ -2456,6 +2432,10 @@ void TrainContral (void)
 				TrainStop &= ~0x10;//
 				InStationFlag = 0;
 				CarInStationFlag = 0;
+				PocketCountOld = 0;
+				PocketCountOld_B = 0;
+				Pocket_A_Count_A = 0;
+				Pocket_A_Count_B = 0;				
 			}				
 		}
 		#if DriveMode //新驱动板

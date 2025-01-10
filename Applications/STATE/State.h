@@ -31,7 +31,9 @@
 
 
  
-
+extern u8 HeartAckFlag;
+extern u32 HeartAckDelay;
+extern u8 JNDtest;
 
 extern u8 Uart1_Rx[UART1_RX_LEN];
 extern u8 Uart1_Tx[UART1_TX_LEN];
@@ -96,6 +98,8 @@ extern u8 SensorWarning;
 extern u8 test121 ;
 extern u8 test123 ;
 extern u8 test124 ;
+
+extern u8 TrainSetingFlag;
 
 extern u16 SensorWarningDelay1,SensorWarningDelay2,SensorWarningDelay3,SensorWarningDelay4,\
 	 SensorWarningDelay5,SensorWarningDelay6,SensorWarningDelay7,SensorWarningDelay8;

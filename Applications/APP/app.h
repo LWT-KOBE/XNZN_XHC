@@ -8,8 +8,8 @@
 extern u32 CAN_ID ;
 extern u8 RxRAM0[8];
 extern u8 Rxflag1 ;
-extern int PocketCount;//U型挡片计数
-extern int Pocket_A_Count,OldPocket_A_Count,NewPocket_A_Count;
+extern int PocketCount,PocketCountOld,PocketCountOld_B;//U型挡片计数
+extern int Pocket_A_Count,OldPocket_A_Count,NewPocket_A_Count,Pocket_A_Count_A,Pocket_A_Count_B;
 
 extern u16 gCheckHeartLiveCount[21];
 extern u16 gCheckHeartOdriveCount;
@@ -23,7 +23,7 @@ extern u8 SensorLD;
 #define DriveMode  1//电机驱动类型 0--老驱动板 1--ODRIVE
 #define NFCMode    0  //NFC模式   0--挡片模式  1--NFC模式
 
-#define TrainVersion  3  //版本号
+#define TrainVersion  7  //版本号
 
 //#define IAP_CAN_ID  01
 
@@ -133,6 +133,7 @@ extern u8 BasketError[24];
 extern u32 APPBasketNum;
 
 extern u32 APPSendADDRFlag;
+extern u32	BoxCopyAddrFlag;
 extern int AppSendAddr[21];
 extern unsigned short int AddrAckState[21];
 extern u32 NFCNUM,NFCNUMold,NFCNUMnew;
@@ -149,6 +150,7 @@ extern u8 FrontCarPositionFlag;
 extern u8 FrontCarInStationCount;
 extern u8 CarInStationFlag;
 extern u8 CarInStationDieStop;
+extern u8 CarInStationCount;
 //extern u8 TrailPositionFlag;
 extern u16 APPSendADDRDelay;
 extern u16 CarPositionPocket;

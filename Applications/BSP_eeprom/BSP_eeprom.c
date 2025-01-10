@@ -44,7 +44,7 @@ void EEPROM_GPIO_Init(void)
 
 void EEPROM_delay(void)
 {
-	delay_us(100);
+	delay_us(20);
 }
 
 bool EEPROM_Start(void)

@@ -69,6 +69,7 @@ void CAN2_TaskGlobalInit(void){
 	//CAN2_Mode_Init(CAN_SJW_1tq,CAN_BS2_5tq,CAN_BS1_9tq,12,CAN_Mode_Normal);
 	//初始化CAN2 波特率1M
 	//CAN2_Mode_Init(CAN_SJW_1tq,CAN_BS2_5tq,CAN_BS1_9tq,3,CAN_Mode_Normal);
+	WIFI_REST = 1;
 }
 
 void CAN2_TaskUpdateTask(void *Parameters){
@@ -97,6 +98,16 @@ void CAN2_TaskUpdateTask(void *Parameters){
 			
 		}		
 		
+		if(HeartAckFlag == 0  && HeartAckDelay >= 100000 && HeartAckDelay < 100050)
+		{
+			WIFI_REST = 0;
+		}	
+		if(HeartAckFlag == 0  && HeartAckDelay >= 100050)
+		{
+			WIFI_REST = 1;
+		}		
+		
+		
 //清上报应答标志		
 		for(u8 i =0;i < 21;i++)
 		{
@@ -109,7 +120,7 @@ void CAN2_TaskUpdateTask(void *Parameters){
 //清上报应答标志	
 		
 //单件上报标志位清零
-		if(PocketCount == 1)//防止未回复一直发
+		if(PocketCount == CaseNum-10)//防止未回复一直发
 		{
 			DeliverResul2APPtBuff = 0;
 			
@@ -159,7 +170,7 @@ void CAN2_TaskUpdateTask(void *Parameters){
 		{
 			CanSendOutStationDelay = 1002;
 		}
-		if(gSpeedR >30)
+		if(gSpeedR >70)
 		{
 			SensorWarningDelay1++;
 			SensorWarningDelay2++;
@@ -303,23 +314,33 @@ void CAN2_TaskUpdateTask(void *Parameters){
 		if(MF_SW == 0)
 			TrainStop |= 0x01;
 		else
-			TrainStop &= ~0x01;
+			TrainStop &= ~0x01;//清除慢反停车
+
+		if(TrainState >= ST1)
+			TrainStop &= ~0x04;//清除急停按钮停车		
 		
-		if(MBSpeed > 0 && (TrainStop&0x02) != 0x02)
-			TrainStop &= ~0xfe;
+		//if(MBSpeed > 0 && (TrainStop&0x02) != 0x02)//清除停车状态
+		if(MBSpeed > 0 )//清除停车状态
+			TrainStop &= ~0xfc;
 		
 
+		
 		if(CageNumber >= CaseNum + 10)//241220
 		{
 			if(CarInStationFlag ==1)
 			{
 				TrainStop &= ~0x08;
 				CarInStationDieStop = 0;
+				CarInStationCount = 0;
 			}
 			else//长遮光未识别停车
 			{
-				TrainStop |= 0x08;//
-				CarInStationDieStop = 1;
+				CarInStationCount++;
+				if(CarInStationCount >= 2)
+				{
+					TrainStop |= 0x08;//
+					CarInStationDieStop = 1;
+				}
 			}						
 			
 		}			
@@ -329,9 +350,9 @@ void CAN2_TaskUpdateTask(void *Parameters){
 //		{
 //			TrainStop |= 0x08;
 //		}
-		
-		
 /*  停车原因处理   */
+		
+
 		
 		digitalIncreasing(&getCAN2_Task()->loops);        
 
